@@ -39,6 +39,21 @@ Each task focuses on a specific concept and shows how AI can improve understandi
 - Applying conditional compilation professionally
 
 ---
+# AI: Integrating Robust Error Handling in OOP
+
+## AI Tool Used
+Gemini Code Assist (VS Code sidebar)
+
+## Files
+- `initial_code.py` — original Product/InventoryManager classes, no validation
+- `refactored_code.py` — final code with @property validation and InvalidProductDataError
+
+## Summary
+Used Gemini Code Assist to add @property-based validation for `price` and `quantity`
+on the Product class, raising a custom InvalidProductDataError on invalid (negative)
+values instead of allowing the app to crash or silently store bad data. Verified with
+a test case assigning a negative quantity, which correctly raised and caught the
+custom exception.
 
 ## Author
 Twiine Mugisha Carlos
