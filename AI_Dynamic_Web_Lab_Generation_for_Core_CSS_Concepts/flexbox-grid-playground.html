@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Flexbox &amp; Grid Playground</title>
+<style>
+  :root {
+    --bg: #f3f6f9;
+    --panel: #ffffff;
+    --ink: #17212b;
+    --muted: #5b6b7a;
+    --line: #d5dde5;
+    --accent: #0b6e8a;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.45;
+  }
+
+  header { padding: 24px 24px 8px; max-width: 1200px; margin: 0 auto; }
+  header h1 { margin: 0 0 4px; font-size: 1.5rem; }
+  header p { margin: 0; color: var(--muted); max-width: 70ch; }
+
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px 24px 32px;
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .panel h2 { margin: 0 0 12px; font-size: 1rem; }
+  .stack > * + * { margin-top: 16px; }
+
+  /* ---------- Controls ---------- */
+  .field { margin-bottom: 14px; }
+  .field label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 0.9rem; font-family: "Cascadia Mono", Consolas, "SF Mono", monospace; }
+  .field select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font: inherit;
+    background: #fff;
+  }
+  .field.inactive label { color: #9aa7b3; }
+  .field.inactive select { background: #eef2f5; color: #9aa7b3; cursor: not-allowed; }
+  .field .why { display: none; margin: 4px 0 0; font-size: 0.8rem; color: var(--muted); }
+  .field.inactive .why { display: block; }
+
+  .tip { margin: 0; font-size: 0.85rem; color: var(--muted); }
+
+  /* ---------- Container and items ---------- */
+  .container {
+    height: 380px;
+    padding: 12px;
+    gap: 10px;
+    overflow: auto;
+    border: 2px dashed #9db3c4;
+    border-radius: 6px;
+    background: #fbfcfd;
+
+    /* the properties below are the ones the dropdowns change */
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: stretch;
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .item {
+    min-width: 72px;
+    padding: 6px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-align: center;
+    color: #0b2540;
+  }
+  /* Different heights make align-items easy to see */
+  .item:nth-child(1) { padding-block: 6px;  background: #8ecae6; }
+  .item:nth-child(2) { padding-block: 12px; background: #b7e4c7; }
+  .item:nth-child(3) { padding-block: 18px; background: #ffd6a5; }
+  .item:nth-child(4) { padding-block: 24px; background: #cdb4db; }
+  .item:nth-child(5) { padding-block: 9px;  background: #ffafcc; }
+
+  pre {
+    margin: 0;
+    padding: 12px;
+    background: #10202e;
+    color: #d7e6f2;
+    border-radius: 6px;
+    font-family: "Cascadia Mono", Consolas, "SF Mono", monospace;
+    font-size: 0.82rem;
+    overflow-x: auto;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>CSS Flexbox &amp; Grid Playground</h1>
+  <p>Change the container's properties with the dropdowns and watch the five items rearrange straight away.</p>
+</header>
+
+<main>
+  <aside class="panel">
+    <h2>Container properties</h2>
+
+    <div class="field" data-prop="display">
+      <label for="display">display</label>
+      <select id="display">
+        <option value="block">block</option>
+        <option value="flex" selected>flex</option>
+        <option value="grid">grid</option>
+      </select>
+    </div>
+
+    <div class="field" data-prop="flex-direction">
+      <label for="flex-direction">flex-direction</label>
+      <select id="flex-direction">
+        <option value="row" selected>row</option>
+        <option value="column">column</option>
+      </select>
+      <p class="why">Only applies when display is flex.</p>
+    </div>
+
+    <div class="field" data-prop="justify-content">
+      <label for="justify-content">justify-content</label>
+      <select id="justify-content">
+        <option value="flex-start" selected>flex-start</option>
+        <option value="center">center</option>
+        <option value="flex-end">flex-end</option>
+        <option value="space-between">space-between</option>
+        <option value="space-around">space-around</option>
+        <option value="space-evenly">space-evenly</option>
+      </select>
+      <p class="why">Ignored when display is block.</p>
+    </div>
+
+    <div class="field" data-prop="align-items">
+      <label for="align-items">align-items</label>
+      <select id="align-items">
+        <option value="flex-start">flex-start</option>
+        <option value="center">center</option>
+        <option value="flex-end">flex-end</option>
+        <option value="stretch" selected>stretch</option>
+        <option value="baseline">baseline</option>
+      </select>
+      <p class="why">Ignored when display is block.</p>
+    </div>
+
+    <div class="field" data-prop="grid-template-columns">
+      <label for="grid-template-columns">grid-template-columns</label>
+      <select id="grid-template-columns">
+        <option value="1fr 1fr">1fr 1fr</option>
+        <option value="1fr 1fr 1fr" selected>1fr 1fr 1fr</option>
+        <option value="1fr 2fr">1fr 2fr</option>
+        <option value="100px 100px 100px">100px 100px 100px</option>
+        <option value="repeat(auto-fit, minmax(100px, 1fr))">repeat(auto-fit, minmax(100px, 1fr))</option>
+      </select>
+      <p class="why">Only applies when display is grid.</p>
+    </div>
+
+    <p class="tip" id="tip"></p>
+  </aside>
+
+  <section class="stack">
+    <div class="panel">
+      <h2>Preview</h2>
+      <div class="container" id="container">
+        <div class="item">Item 1</div>
+        <div class="item">Item 2</div>
+        <div class="item">Item 3</div>
+        <div class="item">Item 4</div>
+        <div class="item">Item 5</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Generated CSS</h2>
+      <pre id="css-out"></pre>
+    </div>
+  </section>
+</main>
+
+<script>
+  const container = document.getElementById('container');
+  const props = ['display', 'flex-direction', 'justify-content', 'align-items', 'grid-template-columns'];
+
+  // Which properties actually do something for each display value
+  const appliesTo = {
+    'display':               () => true,
+    'flex-direction':        d => d === 'flex',
+    'justify-content':       d => d === 'flex' || d === 'grid',
+    'align-items':           d => d === 'flex' || d === 'grid',
+    'grid-template-columns': d => d === 'grid'
+  };
+
+  const tips = {
+    'block': 'block: items stack one under another and every flex or grid property is ignored.',
+    'flex': 'flex: items line up along the main axis. justify-content works along it, align-items across it. Try column to swap the axes.',
+    'grid': 'grid: columns come from grid-template-columns. justify-content only moves the columns when they do not fill the container, so try 100px 100px 100px.'
+  };
+
+  function update() {
+    const values = {};
+    props.forEach(p => {
+      values[p] = document.getElementById(p).value;
+      container.style.setProperty(p, values[p]);   // live update of the container's CSS
+    });
+
+    const d = values['display'];
+    const lines = [];
+    props.forEach(p => {
+      const active = appliesTo[p](d);
+      const field = document.querySelector('[data-prop="' + p + '"]');
+      document.getElementById(p).disabled = !active;
+      field.classList.toggle('inactive', !active);
+      if (active) lines.push('  ' + p + ': ' + values[p] + ';');
+    });
+
+    document.getElementById('tip').textContent = tips[d];
+    document.getElementById('css-out').textContent = '.container {\n' + lines.join('\n') + '\n}';
+  }
+
+  props.forEach(p => document.getElementById(p).addEventListener('change', update));
+  update();
+</script>
+</body>
+</html>

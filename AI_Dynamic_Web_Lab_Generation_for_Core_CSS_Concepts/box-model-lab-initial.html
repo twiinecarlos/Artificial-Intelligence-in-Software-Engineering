@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS Box Model &amp; Display Lab (Initial)</title>
+<style>
+  :root {
+    --c-content: #8ecae6;   /* content area */
+    --c-padding: #b7e4c7;   /* padding area */
+    --c-border:  #1d3557;   /* border */
+    --c-margin:  #ffd6a5;   /* margin area */
+    --bg: #f3f6f9;
+    --panel: #ffffff;
+    --ink: #17212b;
+    --muted: #5b6b7a;
+    --line: #d5dde5;
+    --accent: #0b6e8a;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.45;
+  }
+
+  header { padding: 24px 24px 8px; max-width: 1200px; margin: 0 auto; }
+  header h1 { margin: 0 0 4px; font-size: 1.5rem; }
+  header p { margin: 0; color: var(--muted); max-width: 70ch; }
+
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px 24px 32px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .panel h2 { margin: 0 0 12px; font-size: 1rem; }
+
+  /* ---------- Stage ---------- */
+  .stage {
+    position: relative;
+    isolation: isolate;          /* keeps the margin overlay behind Box 1 but above the stage */
+    min-height: 320px;
+    padding: 24px;
+    overflow-x: auto;
+    border: 2px dashed var(--line);
+    border-radius: 6px;
+    background: #fbfcfd;
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  /* Box 1: the one we control */
+  #box1 {
+    position: relative;
+    box-sizing: content-box;     /* width = content width, so the model is easy to read */
+    display: block;
+    width: 160px;
+    padding: 20px;
+    margin: 20px;
+    border: 8px solid var(--c-border);
+    text-align: center;
+    font-weight: 600;
+    color: #0b2540;
+    /* Two background layers: content colour clipped to the content box,
+       padding colour clipped to the padding box. */
+    background:
+      linear-gradient(var(--c-content), var(--c-content)) content-box,
+      linear-gradient(var(--c-padding), var(--c-padding)) padding-box;
+  }
+
+  /* The margin area cannot be painted by the element itself,
+     so an overlay sits exactly where the margin is. */
+  #box1::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+    background: var(--c-margin);
+    top:    calc(-1 * (var(--mv, 20px) + var(--b, 8px)));
+    bottom: calc(-1 * (var(--mv, 20px) + var(--b, 8px)));
+    left:   calc(-1 * (var(--m, 20px)  + var(--b, 8px)));
+    right:  calc(-1 * (var(--m, 20px)  + var(--b, 8px)));
+  }
+
+  /* Box 2: a neighbour so we can see how Box 1 pushes things around */
+  #box2 {
+    display: inline-block;
+    width: 150px;
+    padding: 12px;
+    border: 2px solid #6b7785;
+    background: #e4e9ee;
+    color: #3b4754;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  /* ---------- Legend ---------- */
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 14px 0 0; font-size: 0.85rem; color: var(--muted); }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(0,0,0,.25); }
+
+  /* ---------- Controls ---------- */
+  .row {
+    display: grid;
+    grid-template-columns: 84px 1fr 52px;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .row label { font-weight: 600; font-size: 0.9rem; }
+  .row output { text-align: right; font-variant-numeric: tabular-nums; color: var(--accent); font-weight: 600; }
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+  select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font: inherit;
+    background: #fff;
+  }
+  .note { margin: 10px 0 0; font-size: 0.85rem; color: var(--muted); }
+
+  pre {
+    margin: 0;
+    padding: 12px;
+    background: #10202e;
+    color: #d7e6f2;
+    border-radius: 6px;
+    font-family: "Cascadia Mono", Consolas, "SF Mono", monospace;
+    font-size: 0.82rem;
+    overflow-x: auto;
+  }
+  .stack > * + * { margin-top: 16px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>CSS Box Model &amp; Display Lab</h1>
+  <p>Change Box 1's padding, margin, border and width, then switch its <code>display</code> value and watch how it behaves next to Box 2.</p>
+</header>
+
+<main>
+  <section class="panel">
+    <h2>Preview</h2>
+    <div class="stage" id="stage">
+      <div id="box1">Box 1</div>
+      <div id="box2">Box 2</div>
+    </div>
+    <div class="legend">
+      <span><i class="swatch" style="background: var(--c-content)"></i>Content</span>
+      <span><i class="swatch" style="background: var(--c-padding)"></i>Padding</span>
+      <span><i class="swatch" style="background: var(--c-border)"></i>Border</span>
+      <span><i class="swatch" style="background: var(--c-margin)"></i>Margin</span>
+    </div>
+  </section>
+
+  <aside class="stack">
+    <section class="panel">
+      <h2>Controls for Box 1</h2>
+
+      <div class="row">
+        <label for="padding">Padding</label>
+        <input type="range" id="padding" min="0" max="80" value="20">
+        <output id="padding-val">20px</output>
+      </div>
+      <div class="row">
+        <label for="margin">Margin</label>
+        <input type="range" id="margin" min="0" max="80" value="20">
+        <output id="margin-val">20px</output>
+      </div>
+      <div class="row">
+        <label for="border">Border width</label>
+        <input type="range" id="border" min="0" max="40" value="8">
+        <output id="border-val">8px</output>
+      </div>
+      <div class="row">
+        <label for="width">Width</label>
+        <input type="range" id="width" min="40" max="500" value="160">
+        <output id="width-val">160px</output>
+      </div>
+
+      <div class="row" style="grid-template-columns: 84px 1fr;">
+        <label for="display">Display</label>
+        <select id="display">
+          <option value="block">block</option>
+          <option value="inline-block">inline-block</option>
+          <option value="inline">inline</option>
+        </select>
+      </div>
+
+      <p class="note" id="display-note"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Box sizes</h2>
+      <p class="note" id="size-note" style="margin-top:0"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Generated CSS</h2>
+      <pre id="css-out"></pre>
+    </section>
+  </aside>
+</main>
+
+<script>
+  const box = document.getElementById('box1');
+  const sliders = ['padding', 'margin', 'border', 'width'].map(id => document.getElementById(id));
+  const displaySelect = document.getElementById('display');
+
+  const displayNotes = {
+    'block': 'block: takes the full row, so Box 2 drops below. Width, padding, margin and border all apply on every side.',
+    'inline-block': 'inline-block: sits in line with Box 2 (note the small gap from the space between the tags) but still respects width and vertical margin.',
+    'inline': 'inline: width and vertical margin are ignored. Vertical padding and border still paint, but they do not push Box 2 away.'
+  };
+
+  function update() {
+    const v = {};
+    sliders.forEach(s => {
+      v[s.id] = Number(s.value);
+      document.getElementById(s.id + '-val').textContent = s.value + 'px';
+    });
+    const d = displaySelect.value;
+
+    // Real CSS properties on Box 1
+    box.style.display = d;
+    box.style.padding = v.padding + 'px';
+    box.style.margin = v.margin + 'px';
+    box.style.borderWidth = v.border + 'px';
+    box.style.width = v.width + 'px';
+
+    // Variables used by the margin overlay (vertical margin does not apply to inline)
+    box.style.setProperty('--m', v.margin + 'px');
+    box.style.setProperty('--mv', (d === 'inline' ? 0 : v.margin) + 'px');
+    box.style.setProperty('--b', v.border + 'px');
+
+    document.getElementById('display-note').textContent = displayNotes[d];
+
+    const borderBoxW = v.width + 2 * v.padding + 2 * v.border;
+    const footprintW = borderBoxW + 2 * v.margin;
+    document.getElementById('size-note').textContent = d === 'inline'
+      ? 'Width is ignored for inline elements. The box is as wide as its text plus horizontal padding, border and margin.'
+      : 'Content ' + v.width + 'px + padding ' + (2 * v.padding) + 'px + border ' + (2 * v.border) +
+        'px = ' + borderBoxW + 'px border-box. With margin (' + (2 * v.margin) + 'px) it occupies ' + footprintW + 'px across.';
+
+    document.getElementById('css-out').textContent =
+`#box1 {
+  display: ${d};
+  width: ${v.width}px;
+  padding: ${v.padding}px;
+  margin: ${v.margin}px;
+  border: ${v.border}px solid;
+}`;
+  }
+
+  sliders.forEach(s => s.addEventListener('input', update));
+  displaySelect.addEventListener('change', update);
+  update();
+</script>
+</body>
+</html>
